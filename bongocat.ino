@@ -1,0 +1,129 @@
+#include <Arduino.h>
+#include <U8g2lib.h>
+#include <Wire.h>
+
+// Constructor nativo para OLED SSD1306 de 128x32 (0.91") usando Hardware I2C
+U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+
+// Configuración de Pines
+const int PIN_BOTON_IZQ = 18;
+const int PIN_BOTON_DER = 19;
+const int PIN_BUZZER    = 5;
+
+// Variables para evitar que el buzzer zumbe infinito (Detección de flanco de bajada)
+bool estado_ant_izq = HIGH;
+bool estado_ant_der = HIGH;
+
+// --- NUEVOS MAPAS DE BITS OPTIMIZADOS (Gatito más chico y estético para 128x32) ---
+#define cuerpo_width 56
+#define cuerpo_height 24
+static const unsigned char cuerpo_bits[] U8X8_PROGMEM = {
+  0x00, 0x38, 0x00, 0x00, 0x00, 0x1c, 0x00,
+  0x00, 0x44, 0x00, 0x00, 0x00, 0x22, 0x00,
+  0x00, 0x82, 0x00, 0x00, 0x00, 0x41, 0x00,
+  0x00, 0x80, 0x00, 0x00, 0x00, 0x40, 0x00,
+  0x00, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00,
+  0x00, 0x40, 0x18, 0x00, 0x06, 0x00, 0x01,
+  0x00, 0x40, 0x18, 0x00, 0x06, 0x00, 0x01,
+  0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x02,
+  0x00, 0x10, 0x00, 0x3c, 0x00, 0x00, 0x04,
+  0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x04,
+  0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x08,
+  0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x10,
+  0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x20,
+  0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40,
+  0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40,
+  0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80,
+  0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80,
+  0x08, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
+  0x04, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00,
+  0x03, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0xff, 0x03, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
+#define pata_izq_up_width 12
+#define pata_izq_up_height 8
+static const unsigned char pata_izq_up_bits[] U8X8_PROGMEM = {
+  0x30, 0x00, 0x48, 0x00, 0x84, 0x00, 0x82, 0x00, 
+  0x42, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+#define pata_izq_down_width 12
+#define pata_izq_down_height 8
+static const unsigned char pata_izq_down_bits[] U8X8_PROGMEM = {
+  0x00, 0x00, 0x00, 0x00, 0x3c, 0x00, 0x42, 0x00, 
+  0x82, 0x00, 0x84, 0x00, 0x48, 0x00, 0x30, 0x00 };
+
+#define pata_der_up_width 12
+#define pata_der_up_height 8
+static const unsigned char pata_der_up_bits[] U8X8_PROGMEM = {
+  0x0c, 0x00, 0x12, 0x00, 0x21, 0x00, 0x41, 0x00, 
+  0x42, 0x00, 0x3c, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+#define pata_der_down_width 12
+#define pata_der_down_height 8
+static const unsigned char pata_der_down_bits[] U8X8_PROGMEM = {
+  0x00, 0x00, 0x00, 0x00, 0x3c, 0x00, 0x42, 0x00, 
+  0x41, 0x00, 0x21, 0x00, 0x12, 0x00, 0x0c, 0x00 };
+
+void setup() {
+  pinMode(PIN_BOTON_IZQ, INPUT_PULLUP);
+  pinMode(PIN_BOTON_DER, INPUT_PULLUP);
+  pinMode(PIN_BUZZER, OUTPUT);
+
+  // Inicialización I2C nativa (SDA=21, SCL=22)
+  Wire.begin(21, 22);
+  u8g2.begin();
+}
+
+void loop() {
+  // Leer los estados actuales de los botones
+  bool b_izq = (digitalRead(PIN_BOTON_IZQ) == LOW);
+  bool b_der = (digitalRead(PIN_BOTON_DER) == LOW);
+
+  // --- Lógica del Buzzer (Efecto Sonoro Táctil) ---
+  // Si el botón izquierdo pasa de NO presionado a PRESIONADO
+  if (b_izq && estado_ant_izq == HIGH) {
+    tone(PIN_BUZZER, 587, 35); // Nota Re5 por 35 milisegundos
+  }
+  // Si el botón derecho pasa de NO presionado a PRESIONADO
+  if (b_der && estado_ant_der == HIGH) {
+    tone(PIN_BUZZER, 659, 35); // Nota Mi5 por 35 milisegundos
+  }
+
+  // Guardar estados para el siguiente ciclo
+  estado_ant_izq = digitalRead(PIN_BOTON_IZQ);
+  estado_ant_der = digitalRead(PIN_BOTON_DER);
+
+  // --- Renderizado en la Pantalla ---
+  u8g2.clearBuffer();
+
+  // Línea de la mesa fija en la parte inferior (Y=26)
+  u8g2.drawLine(0, 26, 128, 26);
+
+  // Coordenadas base para centrar al gatito miniatura en la pantalla
+  int x_body = 36;
+  int y_body = 2; 
+
+  // Dibujar cuerpo mini
+  u8g2.drawXBMP(x_body, y_body, cuerpo_width, cuerpo_height, cuerpo_bits);
+
+  // Control de la patita izquierda
+  if (b_izq) {
+    u8g2.drawXBMP(x_body + 4, y_body + 18, pata_izq_down_width, pata_izq_down_height, pata_izq_down_bits);
+  } else {
+    u8g2.drawXBMP(x_body - 2, y_body + 12, pata_izq_up_width, pata_izq_up_height, pata_izq_up_bits);
+  }
+
+  // Control de la patita derecha
+  if (b_der) {
+    u8g2.drawXBMP(x_body + 40, y_body + 18, pata_der_down_width, pata_der_down_height, pata_der_down_bits);
+  } else {
+    u8g2.drawXBMP(x_body + 46, y_body + 12, pata_der_up_width, pata_der_up_height, pata_der_up_bits);
+  }
+
+  u8g2.sendBuffer();
+  delay(10); 
+}
