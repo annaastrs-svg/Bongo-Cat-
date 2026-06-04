@@ -4,7 +4,6 @@ A little cat that like playing bongos jeje
 is a esp32 with an oled 0.91 and 2 push buttons that when u press them it makes the cat play the bongos
 and making a song with the buzzer.
 
-La mala versión de lo mismo:
 
 https://github.com/user-attachments/assets/e1aa3e66-db3b-455e-aeb5-9e78826d0a42
 
