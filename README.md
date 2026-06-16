@@ -17,3 +17,40 @@ https://wokwi.com/projects/465673627824576513
 
 the btns are in the sides btw 
 
+ESCHEMATIC 
+
+<img width="1919" height="1199" alt="Captura de pantalla 2026-05-30 101031" src="https://github.com/user-attachments/assets/045f329a-c923-4f01-a0ec-112c208ad66e" />
+
+PCB
+<img width="1183" height="924" alt="Captura de pantalla 2026-06-02 063926" src="https://github.com/user-attachments/assets/9028d61a-63e0-4949-a4ec-6997974efd30" />
+
+3D
+<img width="1386" height="813" alt="Captura de pantalla 2026-06-02 064059" src="https://github.com/user-attachments/assets/b860036f-1300-4a86-9a34-797d4fa00c7b" />
+
+BOM
+<img width="1153" height="160" alt="Captura de pantalla 2026-05-28 161119" src="https://github.com/user-attachments/assets/c751e57e-73f1-42c3-8e9b-a953759338fe" />
+
+
+WIRES !!
+
+ESP32 - OLED
+
+GND - GND 
+3V3 - VCC
+21 - SDA 
+22 - SCK
+
+ESP32 - BTN 1 
+
+GND - GND 
+D 18 - S 
+
+ESP32 - BTN 2
+
+GND - GND
+D 19 - S
+
+
+CAD
+
+<img width="743" height="1012" alt="bonggbo clat " src="https://github.com/user-attachments/assets/23325995-3de3-43f9-b318-98f10de3229c" />
