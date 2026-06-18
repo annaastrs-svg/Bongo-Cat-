@@ -34,7 +34,9 @@ the btns are in the sides btw
 
 !! BOM !!
 --
-<img width="1153" height="160" alt="Captura de pantalla 2026-05-28 161119" src="https://github.com/user-attachments/assets/c751e57e-73f1-42c3-8e9b-a953759338fe" />
+<img width="1461" height="212" alt="image" src="https://github.com/user-attachments/assets/d719b77b-e374-4327-ab19-dcabacc4c75f" />
+
+
 
 
 !! WIRING TABLE  !!
