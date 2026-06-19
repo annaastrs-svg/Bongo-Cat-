@@ -1,0 +1,5 @@
+﻿Name,Purpose,Quantity,Total Cost (USD),Link,Distributor
+buzzer,for making bongo noise,1, 55 MX ,https://www.amazon.com.mx/UNIT-ELECTRONICS-Buzzer-Zumbador-Activo/dp/B09MST2Z2P/ref=asc_df_B09MST2Z2P?tag=mxbngshpdsk-20&linkCode=df0&hvadid=83082259711373&hvnetw=o&hvqmt=e&hvbmt=be&hvdev=c&hvlocint=&hvlocphy=151131&hvtargid=pla-4586681484982801&psc=1&msclkid=b6c02d10ac7416a90c06470e896a538b,amazon 
+Push Botton,for controlling the paws of the cat,100, 156 MX ,https://www.ingles.com/traductor/push,DigiKey
+OLED ,for showing the animation ,1, 93 MX ,https://tecnologialg.xataka.com/que-oled/,DigiKey
+ESP32,for controlling the oled,1, 249 MX ,https://www.espressif.com/en/products/socs/esp32,DigiKey 
