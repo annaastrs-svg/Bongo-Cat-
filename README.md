@@ -1,6 +1,9 @@
 - BONGO CAT
   --
 
+SEE BONGO CAT PAGE ! 
+https://annaastrs-svg.github.io/bongo-pag/
+
 A little cat that like playing bongos jeje 
 is a esp32 with an oled 0.91 and 2 push buttons that when u press them it makes the cat play the bongos
 and making a song with the buzzer.
